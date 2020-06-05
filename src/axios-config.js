@@ -1,11 +1,8 @@
 import axios from 'axios';
 
 const companiesInstance = axios.create({
-    baseURL: 'https://recruitment.hal.skygate.io/companies'
+    baseURL: 'https://recruitment.hal.skygate.io/'
 });
 
-const incomesInstance = axios.create({
-    baseURL: 'https://recruitment.hal.skygate.io/incomes/:id'
-});
 
-export { companiesInstance, incomesInstance };
+export default companiesInstance;
