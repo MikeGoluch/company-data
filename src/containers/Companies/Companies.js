@@ -2,35 +2,43 @@ import React, { useState, useEffect, useMemo } from 'react';
 import classes from './Companies.module.css';
 import axios from '../../axios-config';
 import Table from '../../components/UI/Table/Table';
-const qs = require('qs');
 
 const Companies = (props) => {
-    const [data, setData] = useState([]);
+    const totalIncomeHandler = (dataIncome) => {
+        const incomeArray = [];
+        const totalIncome = [];
+        for (const company in dataIncome) {
+            incomeArray.push(dataIncome[company].data)
+        }
+        incomeArray.map(cur => {
+            let total = 0;
+            cur.incomes.map(val => {
+                total += parseFloat(val.value);
+            })
+            totalIncome.push(total.toFixed(2))
+        })
+        console.log('test', totalIncome)
+        return totalIncome;
+    }
+    const [companyData, setCompanyData] = useState([]);
+    const [companyIncome, setCompanyIncome] = useState([]);
     useEffect(() => {
         (async () => {
             const fetchedData = await axios.get('/companies');
-            setData(fetchedData.data);
+            let dataIncome = await Promise.all(fetchedData.data.map(async company => {
+                return await axios.get('/incomes/' + `${company.id}`)
+            }))
+            setCompanyData(fetchedData.data);
+            setCompanyIncome(totalIncomeHandler(dataIncome));
         })();
-        // const fetchData = async () => {
-        //     const companiesData = await axios.get('/companies');
-        //     // const companiesDataId = companiesData.data.map(company => company.id);
-        //     // const companiesIncome = await axios.get('/', {
-        //     //     params: {
-        //     //         storeIds: [82,39,206]
-        //     //     },
-        //     //     paramsSerializer: params => {
-        //     //         console.log(params.storeIds);
-        //     //         // params.storeIds.map(id => id)
-        //     //         return qs.stringify(params, { indices: false })
-        //     //     }
-        //     // })
-        //     console.log('cd', companiesData);
-        //     // console.log('cdi', companiesIncome);
-        // }
-
-        // fetchData();
     }, []);
-
+    console.log('cd', companyData);
+    console.log('ci', companyIncome);
+    const allCompanyData = companyData.map((company, index) => {
+        company.value = companyIncome[index];
+        return company;
+    })
+    console.log('ac', allCompanyData)
     const columns = useMemo(() => [
         {
             Header: 'Companies Data',
@@ -49,14 +57,14 @@ const Companies = (props) => {
                 },
                 {
                     Header: 'Total income',
-                    // accessor: 'show.total'
+                    accessor: 'value'
                 },
             ]
         }
     ]);
 
     return (
-        <Table columns={columns} data={data} />
+        <Table columns={columns} data={companyData} />
     );
 };
 
