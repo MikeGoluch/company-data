@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useTable, useFilters, useSortBy, usePagination } from "react-table";
+import React, { useState } from 'react';
+import { useTable, useFilters, useSortBy, usePagination } from 'react-table';
+import classes from './Table.module.css';
 
 export default function Table({ columns, data }) {
     const [inputNameFilter, setInputNameFilter] = useState('');
@@ -36,15 +37,16 @@ export default function Table({ columns, data }) {
     return (
         <div>
             <input
+                className={classes.FilterInput}
                 value={inputNameFilter}
                 onChange={filterChangeHandler}
                 placeholder={'Filter company name'} />
-            <table {...getTableProps()}>
+            <table className={classes.Table} {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map(column => (
-                                <th {...column.getHeaderProps(column.getSortByToggleProps())} className='sort-desc'>{column.render("Header")}</th>
+                                <th {...column.getHeaderProps(column.getSortByToggleProps())} className='sort-desc'>{column.render('Header')}</th>
                             ))}
                         </tr>
                     ))}
@@ -55,34 +57,37 @@ export default function Table({ columns, data }) {
                         return (
                             <tr {...row.getRowProps()}>
                                 {row.cells.map(cell => {
-                                    return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                                    return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
                                 })}
                             </tr>
                         );
                     })}
                 </tbody>
             </table>
-            <div>
+            <div className={classes.Pagination}>
                 <button onClick={() => previousPage()}
                     disabled={!canPreviousPage}>Previous page</button>
                 <button onClick={() => nextPage()}
                     disabled={!canNextPage}>Next page</button>
-                <div>
+                <div className={classes.Page}>
                     Page{' '}
                     <em>
                         {pageIndex + 1} of {pageOptions.length}
                     </em>
                 </div>
-                <div>Go to page:</div>
-                <input
-                    type="number"
-                    defaultValue={pageIndex + 1 || 1}
-                    onChange={e => {
-                        const page = e.target.value ? Number(e.target.value) - 1 : 0
-                        gotoPage(page)
-                    }}
-                />
+                <div className={classes.GoToPage}>
+                    <p>Go to page:</p>
+                    <input
+                        type='number'
+                        defaultValue={pageIndex + 1 || 1}
+                        onChange={e => {
+                            const page = e.target.value ? Number(e.target.value) - 1 : 0
+                            gotoPage(page)
+                        }}
+                    />
+                </div>
                 <select
+                    className={classes.SelectPage}
                     value={pageSize}
                     onChange={e => {
                         setPageSize(Number(e.target.value))
@@ -90,7 +95,7 @@ export default function Table({ columns, data }) {
                 >
                     {[10, 20, 30, 40, 50].map(pageSize => (
                         <option key={pageSize} value={pageSize}>
-                            Show {pageSize}
+                            Display {pageSize} results
                         </option>
                     ))}
                 </select>
